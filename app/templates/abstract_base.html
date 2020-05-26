@@ -1,0 +1,27 @@
+{% block doc -%}
+<!DOCTYPE html>
+<html lang="en">
+    {% block html %}
+
+    <head>
+        {% block head %}
+        {% block metas %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% endblock metas%}
+        <title>{% block title %}{% endblock title %}</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename = 'access.png')}}">
+        {% block styles %}{% endblock styles %}
+        {% endblock head %}
+    </head>
+    <body>
+        {% block body %}
+        {% block navbar %} {% endblock navbar %}
+        {% block content %} {% endblock content %}
+        {% block scripts %} {% endblock scripts %}
+        {% endblock body %}
+    </body>
+{% endblock html %}
+
+</html>
+{% endblock doc %}
