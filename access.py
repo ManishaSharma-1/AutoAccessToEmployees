@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 25 16:29:27 2020
 
-@author: gandh
-"""
-
-# -*- coding: utf-8 -*-
 """
 Created on Sat May 23 12:25:13 2020
 
@@ -19,10 +12,14 @@ from catboost.datasets import amazon
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sklearn.model_selection
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import cross_validate
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold,cross_validate,train_test_split
 from sklearn.metrics import classification_report,confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score, log_loss
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import OneHotEncoder
+from collections import Counter
+from sklearn.datasets import make_classification
+from imblearn.over_sampling import SMOTE
+from itertools import combinations
 ##Extracting the data
 train_data, test_data =amazon()
 train_data.head()
@@ -46,12 +43,10 @@ null_train = (train_data.isnull())
 null_test =  test_data.isnull()
 ##Imbalanced Dataset graph
 sns.countplot (train_data['ACTION'])
-
-
 #duplicate columns
 train_data.apply(lambda z: len(z.unique()))
 ##confirming the duplicated columns
-from itertools import combinations
+
 for feature_1,feature_2 in combinations(train_data.columns, 2):
     condition1=len(train_data.groupby([feature_1,feature_2]).size())==len(train_data.groupby([feature_1]).size())
     condition2=len(train_data.groupby([feature_1,feature_2]).size())==len(train_data.groupby([feature_2]).size())
@@ -60,15 +55,29 @@ for feature_1,feature_2 in combinations(train_data.columns, 2):
         print(feature_1,feature_2)
         print('Duplicate Data')
 ##drop the duplicated columns
-#new_train_data= train_data.drop('ROLE_CODE', axis =1)
-#new_test_data = test_data.drop('ROLE_CODE' , axis =1)
+new_train_data= train_data.drop(['ROLE_CODE'], axis =1)
+Y = train_data["ACTION"].values
+new_test_data = test_data.drop(['ROLE_CODE' ,'id'], axis =1)
+##Sampling
+##sampling 
+X, y = make_classification(n_classes=2, class_sep=2, weights=[0.2, 0.8], n_informative=2, n_redundant=0, flip_y=0, n_features=8, n_clusters_per_class=1, n_samples=1000, random_state=10)
+print('Original dataset shape %s' % Counter(y))
+sm = SMOTE(random_state = 2) 
+X_train_res, y_train_res = sm.fit_sample(new_train_data,Y)
+train_data_sam= X_train_res[X_train_res["ACTION"]==0].index
+sample_0 = len(X_train_res[X_train_res["ACTION"]==0])
+train_data_sam1= X_train_res[X_train_res["ACTION"]==1].index
+sample_1 = len(X_train_res[X_train_res["ACTION"]==0])
+#train_random_0= np.random.choice(train_data_0, sample_0, replace=False) 
+#train_0= train_data.loc[train_random_0]
+#new_train_0 = train_0.drop('ROLE_CODE' , axis = 1)
+#df_group_train_0 = new_train_0.groupby('ROLE_TITLE')['RESOURCE'].nunique()
+##Test data 
 ## Encoding
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import OneHotEncoder
 
 target = 'ACTION'
-train_columns = [x for x in train_data.columns if x not in [target, "ROLE_CODE"]]
-Y = train_data["ACTION"].values
+train_columns = [x for x in X_train_res if x not in [target]]
+
 ##
 def encode_dataset(train, test, func, func_params = {}):
     dataset = pd.concat([train, test], ignore_index = True)
@@ -83,11 +92,13 @@ def encode_dataset(train, test, func, func_params = {}):
 def one_hot(dataset):
     ohe = OneHotEncoder(sparse=True, dtype=np.float32, handle_unknown='ignore')
     return ohe.fit_transform(dataset.values)
-new_train, new_test = encode_dataset(train_data[train_columns], test_data[train_columns], one_hot)
+new_train, new_test = encode_dataset(X_train_res[train_columns], new_test_data[train_columns], one_hot)
 
 print(new_train.shape, new_test.shape)
 # Split into train & validation set
 X_train, X_val, y_train, y_val = train_test_split(new_train, Y, train_size=0.8)
+
+X_train_un, X_val_un, y_train_un, y_val_un = train_test_split(new_train_data, Y, train_size=0.8)
 ##LOGISTIC REGRESSION
  
 model = LogisticRegression (penalty='l2',  
@@ -97,7 +108,9 @@ model = LogisticRegression (penalty='l2',
                 solver = 'liblinear',
                 max_iter = 1000,)
 model.fit(X_train, y_train)
-       
+from sklearn.ensemble import RandomForestClassifier
+model_1 = RandomForestClassifier(n_estimators = 99, criterion = 'entropy', random_state = 500)
+model_1.fit(X_train_un, y_train_un)
 ##
 def validation(model, X_test, y_test):
 # Make predictions on test set
@@ -134,7 +147,7 @@ def validation(model, X_test, y_test):
     plt.show()
     
 ##
-validation(model, X_val, y_val)
+validation(model_1, X_val_un, y_val_un)
 stats = cross_validate(model, new_train, Y, groups=None, scoring='roc_auc', cv=5, n_jobs=2, return_train_score = True)
 stats = pd.DataFrame(stats)
 stats.describe().transpose()
@@ -173,4 +186,6 @@ len(conc_train)
 ##machine learning on basic
 #to apply sampling techniques
 ##FLASK
+try3 = train_data ['ROLE_TITLE']
+try2 = train_data['ROLE_CODE']['ROLE_TITLE']
 
