@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy  # add
 from datetime import datetime  # add
 import pandas
 from eda import eda_train
+from eda import eda_over
+from sklearn.model_selection import StratifiedKFold,cross_validate,train_test_split
+from sklearn.datasets import make_classification
+from imblearn.over_sampling import SMOTE
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///train.db'  # add
-db = SQLAlchemy(app)  # add
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///train.db'  # add
+# db = SQLAlchemy(app)  # add
 
 
 # add
@@ -71,13 +74,27 @@ def evaluation():
 def run_model():
     return render_template('run_model.html')
 
+def over_sampling(train_data):
+    train_data.head()
+    df= train_data
+    X= train_data.drop(['ROLE_CODE'], axis =1)
+    y = train_data["ACTION"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0) 
+    sm = SMOTE(random_state = 2) 
+    X_train_res, y_train_res = sm.fit_sample(X_train, y_train.values.ravel()) 
+    df_new = pandas.DataFrame(X_train_res, y_train_res)
+    df_new.columns = X_train.columns
+    return X_train_res, y_train_res,df_new
 
 
 @app.route('/model_eda')
 def model_eda():
     train_data = pandas.read_csv("data/train.csv")
+    graphs = {}
     graphs = eda_train(train_data)
-
+    print(len(graphs))
+    X_train_res, y_train_res,df_new = over_sampling(train_data)
+    graphs = eda_over(df_new,graphs)
     return render_template('model_eda.html', data=graphs)
 
 
