@@ -46,7 +46,7 @@ def test():
 
 
 @app.route('/train')
-def train_data(train_data):
+def train_data():
     train_data = pandas.read_csv("data/train.csv")
     print(len(train_data))
     return render_template('train_data.html',data=train_data)
@@ -218,17 +218,21 @@ def grouping_and_onehot(train_data):
 def over_sampling(train_data):
     X = train_data.iloc[:,1:]
     y = train_data.iloc[:,:1]
+
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0) 
     sm = SMOTE(random_state = 2) 
     X_train_res, y_train_res = sm.fit_sample(X_train, y_train.values.ravel()) 
-    df_new = pandas.DataFrame(X_train_res, y_train_res)
+    df_new = pandas.DataFrame(X_train_res,y_train_res)
     df_new.columns = X_train.columns
+    df_new.index = df_new.index.rename('ACTION') 
+    df_new = df_new.reset_index(drop =False)
     return X_train_res, y_train_res,df_new
 
 
 @app.route('/model_eda')
-def model_eda(train_data):
-
+def model_eda():
+    train_data = pandas.read_csv("data/train.csv")
     graphs = {}
     graphs = eda_train(train_data)
     print(len(graphs))
