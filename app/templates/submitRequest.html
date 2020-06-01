@@ -3,7 +3,46 @@
 
 {% block content %}
 <div class="container">
-  <h1 class="my-4">Hii {{data}}</h1>
+  <form>
+  {% for key, value in  data.items() %}
+  {% if key != 'Output' %}
+    <div class="form-group">
+      <div class="row">
+      <div class="col">
+      
+      <label for="exampleFormControlInput1">{{key}}</label>
+    </div>
+    <div class="col">
+      <input type="text" class="form-control" id="exampleFormControlInput1" value = {{value}}>
+      </div>
+    </div>
+  {% else%}
+  {% if value == 0 %}
+  <div class="form-group">
+    <label for="exampleFormControlInput1">{{key}}</label>
+    <input type="text" class="form-control" id="exampleFormControlInput1" value = {{value}}> 
+    <div class="alert alert-danger" role="alert">
+      The access is most likely to be rejected. Please connect if you feel this is incorrect and send a feedback
+    </div>
+  </div>
+  {% else %}
+  <div class="form-group">
+    <label for="exampleFormControlInput1">{{key}}</label>
+    <input type="text" class="form-control" id="exampleFormControlInput1" value = {{value}}> 
+    <div class="alert alert-success" role="alert">
+      The access is most likely to be Accepted. Go ahead and submit your request. 
+    </div>
+  </div>
+
+  {% endif %}
+  {% endif %}
+
+
+
+  
+  </form>
+
+  {% endfor %}
 
 </div>
 {% endblock content %}

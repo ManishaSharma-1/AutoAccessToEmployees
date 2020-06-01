@@ -16,6 +16,7 @@ import io
 import base64
 from sklearn.metrics import roc_curve, auc
 import plotly
+import random
 
 
 app = Flask(__name__)
@@ -40,6 +41,7 @@ def test():
     testdata['ROLE_TITLE'] = request.form.get("ROLE_TITLE","")
     testdata['ROLE_FAMILY_DESC'] = request.form.get("ROLE_FAMILY_DESC","")
     testdata['ROLE_CODE'] = request.form.get("ROLE_CODE","")
+    testdata["Output"] = random.randint(0, 1)
 
     # Run ML algorithm
     return render_template('submitRequest.html',data = testdata)
