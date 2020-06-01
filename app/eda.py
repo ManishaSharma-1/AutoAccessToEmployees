@@ -9,6 +9,10 @@ import base64
 from sklearn.model_selection import StratifiedKFold,cross_validate,train_test_split
 from sklearn.datasets import make_classification
 from imblearn.over_sampling import SMOTE
+    
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
+
 
 def classimbalance(x):
     x_val = ['Action Denied','Action Accepted']
@@ -56,6 +60,31 @@ def columHistograms(df):
 
     return plotlist
 
+def featurimportance(train_data):
+
+    X = train_data.iloc[:,1:]
+    y = train_data.iloc[:,:1]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0) 
+
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+    importance = model.feature_importances_
+    data1 = pandas.DataFrame(importance, columns = ['Importance'])
+    data1['Columns'] = train_data.iloc[:,1:].columns
+    data1 = data1.sort_values('Importance')
+
+    fig = go.Figure([go.Bar(x=data1['Columns'], y=data1['Importance'])])
+    fig.update_layout(title_text='Feature Importance using Random Forest')
+    a = fig.to_json()
+    
+    return json.loads(json.dumps(a,cls=plotly.utils.PlotlyJSONEncoder))
+
+
+
+
+
+
 
 def eda_train(train_data):
 
@@ -64,9 +93,11 @@ def eda_train(train_data):
     uniqueCategory = uniqueCategories(train_data)
     correlationMatrix = correlation(train_data)
     columnHisto = columHistograms(train_data)
+    featureImport = featurimportance(train_data)
 
     graphs['Class Imbalance'] = class_imbalance
     graphs['Unique Categories'] = uniqueCategory
+    graphs['Feature Importance'] = featureImport
     graphs['Correlation Matrix'] = base64.b64encode(correlationMatrix[0]).decode('utf-8')
     graphs['Histograms'] = base64.b64encode(columnHisto[0]).decode('utf-8')
 
