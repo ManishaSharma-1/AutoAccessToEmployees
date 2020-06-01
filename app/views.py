@@ -144,17 +144,17 @@ def plot_confusion_matrix(model_name):
 def evaluation():
     plotlist = plot_auc("LogisticRegression")
     plotly_p = plot_confusion_matrix("LogisticRegression") 
-    # plotlist_knn = plot_auc("KNN")
-    # plotly_p_knn = plot_confusion_matrix("KNN") 
+    plotlist_knn = plot_auc("KNN")
+    plotly_p_knn = plot_confusion_matrix("KNN") 
     plotlist_random = plot_auc("RandomForestClassifier")
     plotly_p_random = plot_confusion_matrix("RandomForestClassifier") 
 
     data_mpl = {}
     data_mpl['LogisticRegression - AUC_ROC'] = base64.b64encode(plotlist[0]).decode('utf-8')
-    # data_mpl['KNN'] =  base64.b64encode(plotlist_knn).decode('utf-8')
+    data_mpl['KNN - AUC_ROC'] =  base64.b64encode(plotlist_knn[0]).decode('utf-8')
     data_mpl['RandomForestClassifier -  AUC_ROC'] =  base64.b64encode(plotlist_random[0]).decode('utf-8')
     data_mpl['LogisticRegression - ConfusionMatrix'] = plotly_p
-    # data_mpl['KNN'] =  base64.b64encode(plotlist_knn).decode('utf-8')
+    data_mpl['KNN - ConfusionMatrix'] =  plotly_p_knn
     data_mpl['RandomForestClassifier -  ConfusionMatrix'] =  plotly_p_random
 
 
