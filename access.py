@@ -64,6 +64,15 @@ X, y = make_classification(n_classes=2, class_sep=2, weights=[0.2, 0.8], n_infor
 print('Original dataset shape %s' % Counter(y))
 sm = SMOTE(random_state = 2) 
 X_train_res, y_train_res = sm.fit_sample(new_train_data,Y)
+sns.countplot (X_train_res['ACTION'])
+plt.figure()
+plt.figure(figsize=(30,20))
+for i in range(1,9):
+    plt.subplot(5,2,i)
+    plt.hist(X_train_res[df.columns[i]])
+    plt.xlabel(X_train_res.columns[i])
+    plt.ylabel("Frequency")
+plt.show()
 train_data_sam= X_train_res[X_train_res["ACTION"]==0].index
 sample_0 = len(X_train_res[X_train_res["ACTION"]==0])
 train_data_sam1= X_train_res[X_train_res["ACTION"]==1].index
