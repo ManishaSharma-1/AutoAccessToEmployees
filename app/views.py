@@ -103,8 +103,8 @@ def plot_confusion_matrix(model_name):
 
     z = [[tn,fp],[fn,tp]]
 
-    x = [1,0]
-    y = [1,0]
+    x = [0,1]
+    y = [0,1]
 
     z_text  = [['True Negative : ' + str(tn),'False Positive : ' + str(fp)],['False Negative : ' + str(fn),'True Positive : ' + str(tp)]]
 
@@ -112,7 +112,7 @@ def plot_confusion_matrix(model_name):
     fig = ff.create_annotated_heatmap(z, x=x, y=y, annotation_text=z_text, colorscale='Viridis')
 
     # add title
-    fig.update_layout(title_text='<i><b>Confusion matrix - Random Forest</b></i>',
+    fig.update_layout(title_text='<i><b>Confusion matrix</b></i>',
                      )
 
     # add custom xaxis title
