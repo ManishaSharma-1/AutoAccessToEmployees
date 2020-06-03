@@ -41,8 +41,6 @@ def test():
     testdata['ROLE_TITLE'] = request.form.get("ROLE_TITLE","")
     testdata['ROLE_FAMILY_DESC'] = request.form.get("ROLE_FAMILY_DESC","")
     testdata['ROLE_CODE'] = request.form.get("ROLE_CODE","")
-    testdata["Output"] = random.randint(0, 1)
-
     # Run ML algorithm
     return render_template('submitRequest.html',data = testdata)
 
@@ -146,16 +144,25 @@ def plot_confusion_matrix(model_name):
 def evaluation():
     plotlist = plot_auc("LogisticRegression")
     plotly_p = plot_confusion_matrix("LogisticRegression") 
+    plotlist_naive = plot_auc("NaiveBayes")
+    plotly_p_naive = plot_confusion_matrix("NaiveBayes")
+
     plotlist_knn = plot_auc("KNN")
     plotly_p_knn = plot_confusion_matrix("KNN") 
     plotlist_random = plot_auc("RandomForestClassifier")
     plotly_p_random = plot_confusion_matrix("RandomForestClassifier") 
+    
 
     data_mpl = {}
     data_mpl['LogisticRegression - AUC_ROC'] = base64.b64encode(plotlist[0]).decode('utf-8')
+    data_mpl['Naive Bayes -  AUC_ROC'] =  base64.b64encode(plotlist_naive[0]).decode('utf-8')
+
     data_mpl['KNN - AUC_ROC'] =  base64.b64encode(plotlist_knn[0]).decode('utf-8')
     data_mpl['RandomForestClassifier -  AUC_ROC'] =  base64.b64encode(plotlist_random[0]).decode('utf-8')
+
     data_mpl['LogisticRegression - ConfusionMatrix'] = plotly_p
+    data_mpl['Naive Bayes -  ConfusionMatrix'] = plotly_p_naive
+
     data_mpl['KNN - ConfusionMatrix'] =  plotly_p_knn
     data_mpl['RandomForestClassifier -  ConfusionMatrix'] =  plotly_p_random
 

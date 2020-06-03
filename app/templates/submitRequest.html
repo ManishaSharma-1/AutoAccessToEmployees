@@ -17,24 +17,21 @@
       </div>
     </div>
   {% else%}
-  {% if value == 0 %}
   <div class="form-group">
-    <label for="exampleFormControlInput1">{{key}}</label>
-    <input type="text" class="form-control" id="exampleFormControlInput1" value = {{value}}> 
+    <label for="exampleFormControlInput1">Output</label>
+    <input type="text" class="form-control" id="exampleFormControlInput1" value = 1> 
     <div class="alert alert-danger" role="alert">
       The access is most likely to be rejected. Please connect if you feel this is incorrect and send a feedback
     </div>
   </div>
-  {% else %}
   <div class="form-group">
-    <label for="exampleFormControlInput1">{{key}}</label>
-    <input type="text" class="form-control" id="exampleFormControlInput1" value = {{value}}> 
+    <label for="exampleFormControlInput1">Output</label>
+    <input type="text" class="form-control" id="exampleFormControlInput1" value = 0> 
     <div class="alert alert-success" role="alert">
       The access is most likely to be Accepted. Go ahead and submit your request. 
     </div>
   </div>
 
-  {% endif %}
   {% endif %}
 
 
